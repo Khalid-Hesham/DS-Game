@@ -8,13 +8,12 @@ public:
 	int data;
 	class node* next;
 };
-
 node* player1_base = NULL;
 node* player2_base = NULL;
 
-
 class player {
 public:
+  
 	int Static_Piece = 2;
 	int Active_Piece = 0;
 	node* p1 = NULL;
@@ -59,6 +58,7 @@ void InitializeGame(node** last) {
 	for (int i = 0; i < 52; i++) {
 		append(last);
 		if (i == 0)
+      
 			player1_base = *last;
 		if (i == 26)
 			player2_base = *last;
@@ -72,6 +72,7 @@ void cls() {
 int RollDice() {
 	return rand() % 6 + 1;
 }
+
 
 void move(node** p, int n) {
 	for (int i = 0; i < n; i++)
@@ -158,6 +159,22 @@ int main() {
 	}
 	Board(last);
 	cout << dice;
+  
+int main() {
+	int dice;
+
+	srand(time(0));
+	node* last = NULL;
+	InitializeGame(&last);
+
+	player1_1 = player1;
+	dice = RollDice();
+	for (int i = 0; i < dice; i++) {
+		player1_1->data = 0;
+		player1_1 = player1_1->next;
+		player1_1->data = 1;
+	}
+
 
 	return 0;
 }
