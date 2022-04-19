@@ -1,6 +1,7 @@
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
 using namespace std;
-
 
 class node {
 public:
@@ -33,11 +34,9 @@ void addToEmpty(node** last, int data = 0) {
 	(*last)->next = *last;
 }
 
-void append(node** last, int index, int data = 0) {
+void append(node** last, int data = 0) {
 	if (*last == NULL) {
 		addToEmpty(last, data);
-		player1 = *last;
-		player1->data = 1;
 		return;
 	}
 
@@ -47,11 +46,6 @@ void append(node** last, int index, int data = 0) {
 	temp->next = (*last)->next;
 	(*last)->next = temp;
 	*last = temp;
-
-	if (index == 26) {
-		player2 = *last;
-		player2->data = 2;
-	}
 }
 
 void traverse(node* last) {
@@ -66,7 +60,11 @@ void traverse(node* last) {
 
 void InitializeGame(node** last) {
 	for (int i = 0; i < 52; i++) {
-		append(last, i);
+		append(last);
+		if (i == 0)
+			player1 = *last;
+		if (i == 26)
+			player2 = *last;
 	}
 }
 
@@ -74,9 +72,25 @@ void cls() {
 	cout << "\033[2J\033[1;1H";
 }
 
+int RollDice() {
+	return rand() % 6 + 1;
+}
+
 int main() {
+	int dice;
+
+	srand(time(0));
 	node* last = NULL;
 	InitializeGame(&last);
+
+	player1_1 = player1;
+	dice = RollDice();
+	for (int i = 0; i < dice; i++) {
+		player1_1->data = 0;
+		player1_1 = player1_1->next;
+		player1_1->data = 1;
+	}
+
 	traverse(last);
 
 	return 0;
