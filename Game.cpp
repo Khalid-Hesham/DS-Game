@@ -366,9 +366,7 @@ void Start(node** last) {
 
 
 int main() {
-	int dice;
-	srand(time(0));
-
+  srand(time(0));
 	node* last = NULL;
 	InitializeGame(&last);
 
