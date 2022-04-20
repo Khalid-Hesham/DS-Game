@@ -18,6 +18,7 @@ public:
 	int Static_Piece = 2;
 	int Active_Piece = 0;
 	int score1 = 0, score2 = 0;
+	int pieces_won = 0;
 	bool win = false;
 	node* piece1 = NULL;
 	node* piece2 = NULL;
@@ -80,14 +81,29 @@ void Stats() {
 	int score1 = player1.score1 + player1.score2;
 	int score2 = player2.score1 + player2.score2;
 
-	if (score1 == 100)
+	if (player1.pieces_won && player1.score2 >= 50)
 		player1.win = true;
-	if (score2 == 100)
+	if (player2.pieces_won && player2.score2 >= 50)
 		player2.win = true;
+
+	if (player1.score1 >= 50) {
+		player1.score1 = 50;
+		player1.piece1->data = 0;
+		if (!player1.pieces_won)
+			player1.pieces_won++;
+	}
+
+	if (player2.score1 >= 50) {
+		player2.score1 = 50;
+		player2.piece1->data = 0;
+		if (!player2.pieces_won)
+			player2.pieces_won++;
+	}
 
 	cout << "==================================================================\n";
 	cout << "||\tPlayer1 Score: " << score1 << "\t\tPlayer2 Score: " << score2 << "\t||\n";
 	cout << "||\tActive: " << player1.Active_Piece << "\t\t\tActive: " << player2.Active_Piece << "\t\t||\n";
+	cout << "||\tPieces Won: " << player1.pieces_won << "\t\t\tPieces Won: " << player2.pieces_won << "\t\t||\n";
 	cout << "==================================================================\n";
 }
 
@@ -178,12 +194,28 @@ void Start(node** last) {
 						player1.score1 += dice;
 						for (int i = 0; i < dice; i++) {
 							player1.piece1->data = 0;
+							if ((player1.piece1 == player2.piece1 || player1.piece1 == player2.piece2) && i != dice)
+								player1.piece1->data = 2;
 							player1.piece1 = player1.piece1->next;
 							player1.piece1->data = 1;
 						}
-						if (player1.piece1 == player2.piece1) {
-							player2.score1 = 0;
-							player2.piece1 = NULL;
+						if (player1.piece1 == player2.piece1 && player2.score1 != 50) {
+							if (player2.Static_Piece) {
+								player2.score1 = 0;
+								player2.piece1 = NULL;
+								player2.Active_Piece--; player2.Static_Piece++;
+							}
+							else {
+								player2.score1 = player1.score2;
+								player2.score2 = 0;
+								player2.piece1 = player2.piece2;
+								player2.piece2 = NULL;
+								player2.Active_Piece--; player2.Static_Piece++;
+							}
+						}
+						if (player1.piece1 == player2.piece2) {
+							player2.score2 = 0;
+							player2.piece2 = NULL;
 							player2.Active_Piece--; player2.Static_Piece++;
 						}
 					}
@@ -196,24 +228,39 @@ void Start(node** last) {
 				goto start;
 			}
 			else if (player1.Active_Piece) {
-				if (player1.Active_Piece == 1)
+				if (player1.Active_Piece == 1 && player1.score1 < 50)
+					goto move1;
+				if (player1.score1 >= 50 && !player1.Static_Piece)
+					goto move2;
+				if (player1.Active_Piece == 1 && player1.score1 >= 50)
 					goto skip;
 				int choice;
 				cout << "If you want to move piece 1 enter 1\n";
 				cout << "If you want to move piece 2 enter 2\n";
 				cin >> choice;
 				if (choice == 1) {
-				skip:
+				move1:
 					player1.score1 += dice;
 					for (int i = 0; i < dice; i++) {
 						player1.piece1->data = 0;
+						if ((player1.piece1 == player2.piece1 || player1.piece1 == player2.piece2) && i != dice)
+							player1.piece1->data = 2;
 						player1.piece1 = player1.piece1->next;
 						player1.piece1->data = 1;
 					}
-					if (player1.piece1 == player2.piece1) {
-						player2.score1 = 0;
-						player2.piece1 = NULL;
-						player2.Active_Piece--; player2.Static_Piece++;
+					if (player1.piece1 == player2.piece1 && player2.score1 != 50) {
+						if (player2.Static_Piece) {
+							player2.score1 = 0;
+							player2.piece1 = NULL;
+							player2.Active_Piece--; player2.Static_Piece++;
+						}
+						else {
+							player2.score1 = player2.score2;
+							player2.score2 = 0;
+							player2.piece1 = player2.piece2;
+							player2.piece2 = NULL;
+							player2.Active_Piece--; player2.Static_Piece++;
+						}
 					}
 					if (player1.piece1 == player2.piece2) {
 						player2.score2 = 0;
@@ -222,16 +269,28 @@ void Start(node** last) {
 					}
 				}
 				else if (choice == 2) {
+				move2:
 					player1.score2 += dice;
 					for (int i = 0; i < dice; i++) {
 						player1.piece2->data = 0;
+						if ((player1.piece2 == player2.piece1 || player1.piece2 == player2.piece2) && i != dice)
+							player1.piece2->data = 2;
 						player1.piece2 = player1.piece2->next;
 						player1.piece2->data = 1;
 					}
-					if (player1.piece2 == player2.piece1) {
-						player2.score1 = 0;
-						player2.piece1 = NULL;
-						player2.Active_Piece--; player2.Static_Piece++;
+					if (player1.piece2 == player2.piece1 && player2.score1 != 50) {
+						if (player2.Static_Piece) {
+							player2.score1 = 0;
+							player2.piece1 = NULL;
+							player2.Active_Piece--; player2.Static_Piece++;
+						}
+						else {
+							player2.score1 = player2.score2;
+							player2.score2 = 0;
+							player2.piece1 = player2.piece2;
+							player2.piece2 = NULL;
+							player2.Active_Piece--; player2.Static_Piece++;
+						}
 					}
 					if (player1.piece2 == player2.piece2) {
 						player2.score2 = 0;
@@ -260,14 +319,16 @@ void Start(node** last) {
 				goto start;
 			}
 			else if (player2.Active_Piece) {
-				if (player2.score1 - player2.score2 <= 6 || player2.score1 <= 50) {
+				if ((player2.score1 - player2.score2 <= 6 || !player2.piece2) && player2.score1 <= 50) {
 					player2.score1 += dice;
 					for (int i = 0; i < dice; i++) {
 						player2.piece1->data = 0;
+						if ((player2.piece1 == player1.piece1 || player2.piece1 == player1.piece2) && i != dice)
+							player2.piece1->data = 1;
 						player2.piece1 = player2.piece1->next;
 						player2.piece1->data = 2;
 					}
-					if (player2.piece1 == player1.piece1) {
+					if (player2.piece1 == player1.piece1 && player1.score1 != 50) {
 						player1.score1 = 0; player1.piece1 = NULL;
 						player1.Active_Piece--; player1.Static_Piece++;
 					}
@@ -280,10 +341,12 @@ void Start(node** last) {
 					player2.score2 += dice;
 					for (int i = 0; i < dice; i++) {
 						player2.piece2->data = 0;
+						if ((player2.piece2 == player1.piece1 || player2.piece2 == player1.piece2) && i != dice)
+							player2.piece2->data = 1;
 						player2.piece2 = player2.piece2->next;
-						player2.piece2->data = 1;
+						player2.piece2->data = 2;
 					}
-					if (player2.piece2 == player1.piece1) {
+					if (player2.piece2 == player1.piece1 && player1.score1 != 50) {
 						player1.score1 = 0; player1.piece1 = NULL;
 						player1.Active_Piece--; player1.Static_Piece++;
 					}
@@ -296,6 +359,7 @@ void Start(node** last) {
 					goto start;
 			}
 		}
+	skip:
 		turns++;
 	}
 }
@@ -309,6 +373,11 @@ int main() {
 	InitializeGame(&last);
 
 	Start(&last);
+	
+	if (player1.win)
+		cout << "\n\tPLAYER 1 WON CONGRATS!!!\n";
+	else
+		cout << "\n\tPLAYER 2 WON CONGRATS!!!\n";
 
 	return 0;
 }
