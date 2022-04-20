@@ -319,7 +319,7 @@ void Start(node** last) {
 				goto start;
 			}
 			else if (player2.Active_Piece) {
-				if ((player2.score1 - player2.score2 <= 6 || !player2.piece2) && player2.score1 <= 50) {
+				if ((player2.score1 - player2.score2 <= 6 || !player2.piece2) && player2.score1 < 50) {
 					player2.score1 += dice;
 					for (int i = 0; i < dice; i++) {
 						player2.piece1->data = 0;
@@ -341,7 +341,7 @@ void Start(node** last) {
 					player2.score2 += dice;
 					for (int i = 0; i < dice; i++) {
 						player2.piece2->data = 0;
-						if ((player2.piece2 == player1.piece1 || player2.piece2 == player1.piece2) && i != dice)
+						if (player2.piece2 == player1.piece1 || player2.piece2 == player1.piece2)
 							player2.piece2->data = 1;
 						player2.piece2 = player2.piece2->next;
 						player2.piece2->data = 2;
